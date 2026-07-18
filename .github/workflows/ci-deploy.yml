@@ -81,11 +81,12 @@ jobs:
     steps:
       - name: Configure deployment SSH key
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.OMNILAB_SSH_PRIVATE_KEY }}
+          SSH_PRIVATE_KEY_BASE64: ${{ secrets.OMNILAB_SSH_PRIVATE_KEY }}
         run: |
           install -m 0700 -d ~/.ssh
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/ominilab_deploy
+          printf '%s' "$SSH_PRIVATE_KEY_BASE64" | base64 --decode > ~/.ssh/ominilab_deploy
           chmod 0600 ~/.ssh/ominilab_deploy
+          ssh-keygen -y -f ~/.ssh/ominilab_deploy > /dev/null
           printf '%s\n' \
             'ominilab.vatli365.vn ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDbxXeOyNZ+FVlN8nQ5bVqB7uQsfCDBwnz+NDvAMBwCG' \
             > ~/.ssh/known_hosts
