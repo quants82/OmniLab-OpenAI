@@ -1,13 +1,13 @@
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$backendDir = Join-Path $repoRoot "backend_OmiLab"
-$frontendDir = Join-Path $repoRoot "frontend_OmiLb"
+$backendDir = Join-Path $repoRoot "backend_Ominilab"
+$frontendDir = Join-Path $repoRoot "frontend_Ominilab"
 $backendPython = Join-Path $backendDir ".venv\Scripts\python.exe"
-$testDatabase = Join-Path $env:TEMP "omnilab-ci-$PID.db"
+$testDatabase = Join-Path $env:TEMP "ominilab-ci-$PID.db"
 
 if (-not (Test-Path $backendPython)) {
-    throw "Backend virtual environment is missing. Create backend_OmiLab\.venv first."
+    throw "Backend virtual environment is missing. Create backend_Ominilab\.venv first."
 }
 
 Write-Host "[1/4] Checking backend syntax"
@@ -29,7 +29,7 @@ try {
     $env:DATABASE_PATH = $testDatabase
     $env:APP_SECRET = "local-ci-only-secret"
     $env:DEMO_USERNAME = "judge"
-    $env:DEMO_PASSWORD = "omnilab-demo"
+    $env:DEMO_PASSWORD = "ominilab-demo"
     Push-Location $backendDir
     try {
         & $backendPython -m pytest -q tests

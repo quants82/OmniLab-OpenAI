@@ -5,6 +5,6 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 
-frontend_OmiLb/node_modules/
-frontend_OmiLb/dist/
-frontend_OmiLb/.astro/
+frontend_Ominilab/node_modules/
+frontend_Ominilab/dist/
+frontend_Ominilab/.astro/

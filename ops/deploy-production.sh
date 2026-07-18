@@ -3,13 +3,13 @@ set -Eeuo pipefail
 
 APP_USER="ominilab"
 APP_DIR="/var/www/ominilab.vatli365.vn/app"
-BACKEND_DIR="${APP_DIR}/backend_OmiLab"
-FRONTEND_DIR="${APP_DIR}/frontend_OmiLb"
+BACKEND_DIR="${APP_DIR}/backend_Ominilab"
+FRONTEND_DIR="${APP_DIR}/frontend_Ominilab"
 VENV="/var/www/ominilab.vatli365.vn/venv"
 
 exec 9>/run/lock/ominilab-deploy.lock
 if ! flock -n 9; then
-    echo "Another OminiLab deployment is already running."
+    echo "Another Ominilab deployment is already running."
     exit 1
 fi
 
@@ -55,7 +55,7 @@ for attempt in {1..15}; do
         http://127.0.0.1:8010/api/lab/health
     then
         echo
-        echo "OminiLab deployment completed successfully."
+        echo "Ominilab deployment completed successfully."
         exit 0
     fi
     sleep 1

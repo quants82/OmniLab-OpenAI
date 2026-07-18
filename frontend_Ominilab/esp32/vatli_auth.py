@@ -1,4 +1,4 @@
-"""Open OminiLab Wi-Fi helper with no subscription gate or device secrets."""
+"""Open Ominilab Wi-Fi helper with no subscription gate or device secrets."""
 
 import machine
 import network
@@ -74,7 +74,7 @@ def _form_value(request, name):
 def _setup_portal():
     access_point = network.WLAN(network.AP_IF)
     access_point.active(True)
-    access_point.config(essid="OminiLab-Setup-" + get_mac()[-4:])
+    access_point.config(essid="Ominilab-Setup-" + get_mac()[-4:])
     server = socket.socket()
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind(("0.0.0.0", 80))
@@ -82,7 +82,7 @@ def _setup_portal():
     server.settimeout(180)
     page = """<!doctype html><html><meta name=viewport content='width=device-width'>
     <body style='font-family:sans-serif;max-width:520px;margin:40px auto;padding:20px'>
-    <h2>OminiLab ESP32 setup</h2><p>Device ID: <b>{device}</b></p>
+    <h2>Ominilab ESP32 setup</h2><p>Device ID: <b>{device}</b></p>
     <form method=post><label>Wi-Fi name</label><br><input name=ssid required style='width:100%;padding:10px'><br><br>
     <label>Wi-Fi password</label><br><input name=password type=password style='width:100%;padding:10px'><br><br>
     <label>Backend hostname</label><br><input name=host value='{host}' required style='width:100%;padding:10px'><br><br>

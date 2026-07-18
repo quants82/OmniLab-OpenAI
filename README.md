@@ -1,6 +1,6 @@
-# OminiLab: AI-Powered Open Physics Sandbox
+# Ominilab: AI-Powered Open Physics Sandbox
 
-OminiLab turns low-cost ESP32 components into an open, globally accessible physics laboratory. Students flash public MicroPython firmware, stream real measurements to a browser, inspect live charts, and receive experiment-grounded feedback from GPT-5.6.
+Ominilab turns low-cost ESP32 components into an open, globally accessible physics laboratory. Students flash public MicroPython firmware, stream real measurements to a browser, inspect live charts, and receive experiment-grounded feedback from GPT-5.6.
 
 ## Six focused experiments
 
@@ -31,15 +31,15 @@ ESP32 firmware --WSS--> FastAPI relay --WSS--> Astro/React experiment UI
                                                  +--> GPT-5.6 Responses API
 ```
 
-- [`frontend_OmiLb`](./frontend_OmiLb): Astro + React UI, WebSerial flasher, public MicroPython sources
-- [`backend_OmiLab`](./backend_OmiLab): FastAPI, WebSockets, SQLite authentication, OpenAI API adapter
+- [`frontend_Ominilab`](./frontend_Ominilab): Astro + React UI, WebSerial flasher, public MicroPython sources
+- [`backend_Ominilab`](./backend_Ominilab): FastAPI, WebSockets, SQLite authentication, OpenAI API adapter
 
 ## Run locally
 
 ### Backend
 
 ```bash
-cd backend_OmiLab
+cd backend_Ominilab
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
@@ -50,7 +50,7 @@ uvicorn main:app --reload --port 8000
 ### Frontend
 
 ```bash
-cd frontend_OmiLb
+cd frontend_Ominilab
 npm install
 copy .env.example .env
 npm run dev
@@ -60,7 +60,7 @@ Open `http://localhost:3003`. API documentation is available at `http://localhos
 
 ## Demo access
 
-The backend seeds a judge account using `DEMO_USERNAME` and `DEMO_PASSWORD` from `.env`. The sample values are `judge` / `omnilab-demo`; change them before any non-demo deployment.
+The backend seeds a judge account using `DEMO_USERNAME` and `DEMO_PASSWORD` from `.env`. The sample values are `judge` / `ominilab-demo`; change them before any non-demo deployment.
 
 ## Configuration
 

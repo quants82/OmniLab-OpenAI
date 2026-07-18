@@ -21,7 +21,7 @@ def test_health_login_and_firmware_manifest() -> None:
 
         login = client.post(
             "/api/auth/login",
-            json={"username": "judge", "password": "omnilab-demo"},
+            json={"username": "judge", "password": "ominilab-demo"},
         )
         assert login.status_code == 200
         token = login.json()["access_token"]

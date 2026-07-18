@@ -144,7 +144,7 @@ class WiFiManager:
         ap = network.WLAN(network.AP_IF)
         ap.active(True)
         ap_name = "Vatli365_Setup_{}".format(MAC_ADDR.replace(':', '')[-4:])
-        ap.config(essid=ap_name, password="omnilab-open")
+        ap.config(essid=ap_name, password="ominilab-open")
 
         print(f"Portal started: {ap_name}")
         lcd_update("Setup WiFi:", ap_name)

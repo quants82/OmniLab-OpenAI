@@ -18,9 +18,9 @@ def _path_from_env(name: str, default: Path) -> Path:
 
 @dataclass(frozen=True)
 class Settings:
-    app_name: str = os.getenv("APP_NAME", "OminiLab Open Physics Backend")
+    app_name: str = os.getenv("APP_NAME", "Ominilab Open Physics Backend")
     app_secret: str = os.getenv("APP_SECRET", "development-only-change-me")
-    database_path: Path = _path_from_env("DATABASE_PATH", BASE_DIR / "data" / "omnilab.db")
+    database_path: Path = _path_from_env("DATABASE_PATH", BASE_DIR / "data" / "ominilab.db")
     access_token_minutes: int = int(os.getenv("ACCESS_TOKEN_MINUTES", "1440"))
     cors_origins: tuple[str, ...] = tuple(
         origin.strip()
@@ -28,11 +28,11 @@ class Settings:
         if origin.strip()
     )
     demo_username: str = os.getenv("DEMO_USERNAME", "judge")
-    demo_password: str = os.getenv("DEMO_PASSWORD", "omnilab-demo")
+    demo_password: str = os.getenv("DEMO_PASSWORD", "ominilab-demo")
     openai_api_key: str = os.getenv("OPENAI_API_KEY", "")
     openai_model: str = os.getenv("OPENAI_MODEL", "gpt-5.6")
     public_ws_host: str = os.getenv("PUBLIC_WS_HOST", "your-backend.example.com")
-    firmware_source_dir: Path = (BASE_DIR.parent / "frontend_OmiLb" / "esp32").resolve()
+    firmware_source_dir: Path = (BASE_DIR.parent / "frontend_Ominilab" / "esp32").resolve()
 
 
 settings = Settings()
