@@ -98,7 +98,7 @@ Codex accelerated cross-layer tracing, implementation, debugging, command genera
 - **GPT-5.6 is part of the running learning experience:** the harmonic-motion lab sends the declared data source and run statistics—period, frequency, angular frequency, amplitude, maximum velocity, and maximum acceleration—to the backend. GPT-5.6 generates leveled questions and evaluates a learner's answer against that specific run.
 - **The browser cannot choose another model:** the API key and `OPENAI_MODEL=gpt-5.6` remain server-side, and the [backend contract test](./backend_Ominilab/tests/test_smoke.py) verifies that a browser-supplied model value cannot override the configured model.
 
-The more detailed chronological account, including the pre-existing/new-work boundary, is in [`docs/BUILD_WEEK_DELTA.md`](./docs/BUILD_WEEK_DELTA.md). The primary Codex `/feedback` Session ID will be added under **Competition evidence** before submission.
+The more detailed chronological account, including the pre-existing/new-work boundary, is in [`docs/BUILD_WEEK_DELTA.md`](./docs/BUILD_WEEK_DELTA.md). The primary Codex `/feedback` Session ID is listed under **Competition evidence** below.
 
 ## Architecture
 
@@ -176,7 +176,7 @@ Before committing:
 
 ## Competition evidence
 
-Primary Codex `/feedback` Session ID: **`[REQUIRED BEFORE SUBMISSION]`**
+Primary Codex `/feedback` Session ID: **`019f7484-26c0-7c91-b955-b437da0e7170`**
 
 Public YouTube demo: **`[REQUIRED BEFORE SUBMISSION]`**
 
