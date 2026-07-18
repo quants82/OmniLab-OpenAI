@@ -58,7 +58,7 @@ Do not paste PowerShell backticks or `$env:` expressions into a Linux shell.
 
 The deployment job expects repository secret `OMINILAB_SSH_PRIVATE_KEY_B64`. Its value must be the Base64 encoding of the complete private-key file, not the public `.pub` line. The workflow strips whitespace, decodes it, validates it with `ssh-keygen`, and pins the production ED25519 host key.
 
-As of 2026-07-19, validation works but automatic deployment is still blocked by invalid Base64 secret content. Manual deployment works. Follow `CURRENT_STATUS.md` before relying on automatic deployment.
+Automatic deployment was verified end to end on 2026-07-19 with workflow #10 for commit `4857de8`. If key decoding fails again, use the recovery steps in `OPERATIONS.md`; manual deployment remains available as a controlled fallback.
 
 ## Post-deployment verification
 

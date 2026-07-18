@@ -1,5 +1,11 @@
 $ErrorActionPreference = "Stop"
 
+function Assert-LastExitCode([string]$step) {
+    if ($LASTEXITCODE -ne 0) {
+        throw "$step failed with exit code $LASTEXITCODE."
+    }
+}
+
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $backendDir = Join-Path $repoRoot "backend_Ominilab"
 $frontendDir = Join-Path $repoRoot "frontend_Ominilab"
@@ -18,6 +24,7 @@ Write-Host "[1/4] Checking backend syntax"
     (Join-Path $backendDir "dependencies.py") `
     (Join-Path $backendDir "security.py") `
     (Join-Path $backendDir "routers")
+Assert-LastExitCode "Backend syntax check"
 
 Write-Host "[2/4] Running backend smoke tests"
 $previousDatabasePath = $env:DATABASE_PATH
@@ -33,6 +40,7 @@ try {
     Push-Location $backendDir
     try {
         & $backendPython -m pytest -q tests
+        Assert-LastExitCode "Backend smoke tests"
     }
     finally {
         Pop-Location
@@ -48,6 +56,7 @@ finally {
 
 Write-Host "[3/4] Installing locked frontend dependencies"
 & npm.cmd --prefix $frontendDir ci
+Assert-LastExitCode "Frontend dependency install"
 
 Write-Host "[4/4] Building frontend"
 $previousApiUrl = $env:PUBLIC_API_URL
@@ -57,6 +66,7 @@ try {
     $env:PUBLIC_API_URL = "https://ominilab.vatli365.vn"
     $env:PUBLIC_SITE_URL = "https://ominilab.vatli365.vn"
     & npm.cmd --prefix $frontendDir run build
+    Assert-LastExitCode "Frontend build"
 }
 finally {
     if ($null -eq $previousApiUrl) { Remove-Item Env:PUBLIC_API_URL -ErrorAction SilentlyContinue } else { $env:PUBLIC_API_URL = $previousApiUrl }

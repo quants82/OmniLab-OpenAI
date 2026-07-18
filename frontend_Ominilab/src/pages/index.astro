@@ -2,16 +2,16 @@
 import Layout from '../layouts/Layout.astro';
 
 const experiments = [
-  ['〰️', 'Harmonic Motion', 'BMI160 acceleration data and real-time motion analysis.', '/harmonic-motion-bmi160'],
-  ['🌡️', 'Specific Heat Capacity', 'Measure the specific heat capacity of water from live temperature and power data.', '/specific-heat'],
-  ['🧲', 'Electromagnetic Induction', 'Observe induced voltage as the magnetic flux changes.', '/induction'],
-  ['⚡', 'Capacitor Charge & Discharge', 'Capture exponential voltage curves and estimate the time constant.', '/capacitor'],
-  ['💡', 'Incandescent Lamp I-V', 'Measure the nonlinear current-voltage response of a filament lamp.', '/lamp-va'],
-  ['〽️', 'Resistor I-V', 'Verify Ohm’s law using ESP32 voltage and current measurements.', '/resistor-va'],
+  ['〰️', 'Harmonic Motion', 'BMI160 acceleration data and real-time motion analysis.', '/harmonic-motion-bmi160/'],
+  ['🌡️', 'Specific Heat Capacity', 'Measure the specific heat capacity of water from live temperature and power data.', '/specific-heat/'],
+  ['🧲', 'Electromagnetic Induction', 'Observe induced voltage as the magnetic flux changes.', '/induction/'],
+  ['⚡', 'Capacitor Charge & Discharge', 'Capture exponential voltage curves and estimate the time constant.', '/capacitor/'],
+  ['💡', 'Incandescent Lamp I-V', 'Measure the nonlinear current-voltage response of a filament lamp.', '/lamp-va/'],
+  ['〽️', 'Resistor I-V', 'Verify Ohm’s law using ESP32 voltage and current measurements.', '/resistor-va/'],
 ];
 ---
 
-<Layout title="Ominilab — AI-Powered Open Physics Sandbox">
+<Layout title="Ominilab - Open Hardware, Real Physics, Grounded AI">
   <section class="relative overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-800 to-violet-800 text-white">
     <div class="absolute inset-0 opacity-20 [background-image:radial-gradient(circle_at_20%_20%,white,transparent_28%),radial-gradient(circle_at_80%_70%,#67e8f9,transparent_25%)]"></div>
     <div class="relative mx-auto max-w-7xl px-4 py-24 md:py-32">
@@ -20,8 +20,39 @@ const experiments = [
         <h1 class="mt-7 text-5xl font-black leading-tight md:text-7xl">Real physics.<br/><span class="text-cyan-300">Open hardware. AI insight.</span></h1>
         <p class="mt-6 max-w-3xl text-xl leading-relaxed text-blue-100">Ominilab turns low-cost ESP32 kits into a globally accessible laboratory. Collect real measurements, inspect live charts, and ask GPT-5.6 to explain the experiment.</p>
         <div class="mt-9 flex flex-wrap gap-4">
-          <a href="/experiments" class="rounded-xl bg-white px-6 py-3 font-black text-blue-800 shadow-xl hover:bg-blue-50">Explore six experiments</a>
-          <a href="/nap-firmware" class="rounded-xl border border-white/30 bg-white/10 px-6 py-3 font-black text-white hover:bg-white/20">Flash an ESP32</a>
+          <a href="/experiments/" class="rounded-xl bg-white px-6 py-3 font-black text-blue-800 shadow-xl hover:bg-blue-50">Explore six experiments</a>
+          <a href="/nap-firmware/" class="rounded-xl border border-white/30 bg-white/10 px-6 py-3 font-black text-white hover:bg-white/20">Flash an ESP32</a>
+          <a href="/judges/" class="rounded-xl border border-cyan-200/50 bg-cyan-300/10 px-6 py-3 font-black text-cyan-50 hover:bg-cyan-300/20">Judge quick start</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-y border-slate-200 bg-white">
+    <div class="mx-auto max-w-7xl px-4 py-20">
+      <div class="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+        <div>
+          <p class="text-xs font-black uppercase tracking-[0.2em] text-rose-600">The problem</p>
+          <h2 class="mt-3 text-4xl font-black text-slate-900">Real labs do not scale. Simulations are not reality.</h2>
+          <p class="mt-5 text-lg leading-relaxed text-slate-600">Schools often face scarce stations, short setup windows, manual transcription, closed data loggers, and feedback delivered after the experiment. Simulations improve access but hide wiring, calibration, sensor noise, and uncertainty.</p>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <article class="rounded-3xl border border-blue-100 bg-blue-50 p-6">
+            <p class="text-xs font-black uppercase tracking-widest text-blue-700">Keep the physics real</p>
+            <p class="mt-3 text-sm leading-relaxed text-slate-700">Physical sensors preserve calibration, noise, apparatus design, and the gap between a theoretical model and measured evidence.</p>
+          </article>
+          <article class="rounded-3xl border border-emerald-100 bg-emerald-50 p-6">
+            <p class="text-xs font-black uppercase tracking-widest text-emerald-700">Make observation scalable</p>
+            <p class="mt-3 text-sm leading-relaxed text-slate-700">One ESP32 can stream to multiple browser observers, turning a scarce apparatus into a shared live learning experience.</p>
+          </article>
+          <article class="rounded-3xl border border-violet-100 bg-violet-50 p-6">
+            <p class="text-xs font-black uppercase tracking-widest text-violet-700">Open the black box</p>
+            <p class="mt-3 text-sm leading-relaxed text-slate-700">Readable MicroPython, source hashes, and OpenAPI documentation expose the complete path from sensor to graph.</p>
+          </article>
+          <article class="rounded-3xl border border-amber-100 bg-amber-50 p-6">
+            <p class="text-xs font-black uppercase tracking-widest text-amber-700">Ground AI in evidence</p>
+            <p class="mt-3 text-sm leading-relaxed text-slate-700">GPT-5.6 uses measured quantities to ask and evaluate questions that learners can challenge with their own data.</p>
+          </article>
         </div>
       </div>
     </div>
@@ -45,11 +76,24 @@ const experiments = [
     </div>
   </section>
 
-  <section class="border-y border-slate-200 bg-white">
+  <section class="border-y border-slate-200 bg-slate-950 text-white">
     <div class="mx-auto grid max-w-7xl gap-8 px-4 py-16 md:grid-cols-3">
-      <div><div class="text-3xl">📡</div><h3 class="mt-3 font-black">Live ESP32 data</h3><p class="mt-2 text-sm text-slate-600">A minimal FastAPI WebSocket relay connects every kit to its browser dashboard.</p></div>
-      <div><div class="text-3xl">🔓</div><h3 class="mt-3 font-black">Open firmware</h3><p class="mt-2 text-sm text-slate-600">The six MicroPython programs and required drivers are visible, auditable, and flashable in the browser.</p></div>
-      <div><div class="text-3xl">🤖</div><h3 class="mt-3 font-black">GPT-5.6 lab assistant</h3><p class="mt-2 text-sm text-slate-600">Experiment measurements become grounded questions, feedback, and physics explanations.</p></div>
+      <div><div class="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Science + data</div><h3 class="mt-3 font-black">Live ESP32 evidence</h3><p class="mt-2 text-sm leading-relaxed text-slate-300">A minimal FastAPI WebSocket relay connects each kit to its browser dashboard and multiple observers.</p></div>
+      <div><div class="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Engineering + code</div><h3 class="mt-3 font-black">Open firmware</h3><p class="mt-2 text-sm leading-relaxed text-slate-300">Six MicroPython programs and their drivers are visible, auditable, and flashable in the browser.</p></div>
+      <div><div class="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Reflection + AI literacy</div><h3 class="mt-3 font-black">GPT-5.6 grounded feedback</h3><p class="mt-2 text-sm leading-relaxed text-slate-300">Measured results become questions and feedback that students can verify against physical evidence.</p></div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-7xl px-4 py-20">
+    <div class="rounded-[2rem] bg-gradient-to-r from-blue-700 to-violet-700 p-8 text-white shadow-xl md:p-12">
+      <div class="grid gap-8 md:grid-cols-[1fr_auto] md:items-center">
+        <div>
+          <p class="text-xs font-black uppercase tracking-[0.2em] text-cyan-200">Education track</p>
+          <h2 class="mt-3 text-3xl font-black md:text-4xl">Built for inquiry, STEM practice, and critical AI literacy</h2>
+          <p class="mt-4 max-w-3xl leading-relaxed text-blue-100">Ominilab combines physics, electronics, coding, regression, evidence-based explanation, and critique of AI output. It is open source and designed for schools, universities, STEM clubs, and remote demonstrations in supported countries.</p>
+        </div>
+        <a href="/judges/" class="rounded-xl bg-white px-6 py-3 text-center font-black text-blue-800 hover:bg-blue-50">Review the evidence</a>
+      </div>
     </div>
   </section>
 </Layout>

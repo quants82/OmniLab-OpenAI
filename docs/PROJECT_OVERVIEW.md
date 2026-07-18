@@ -32,6 +32,7 @@ Ominilab is a standalone, open-source physics laboratory for OpenAI Build Week 2
 - Public source bundles that install each experiment as `main.py` plus required helper files.
 - In-memory, bidirectional WebSocket relay: one active ESP32 and multiple browser clients per device ID.
 - OpenAI Responses API adapter fixed by server configuration (`OPENAI_MODEL`, currently `gpt-5.6`).
+- Deterministic harmonic-motion judge replay, explicitly labeled as synthetic in both the UI and GPT-5.6 prompt.
 - Static Astro output served by Nginx; FastAPI serves REST, WebSocket, and OpenAPI routes.
 
 ## Deliberately excluded

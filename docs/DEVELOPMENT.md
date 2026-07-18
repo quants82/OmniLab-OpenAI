@@ -79,7 +79,7 @@ git commit -m "Describe the change"
 git push origin main
 ```
 
-Pushing `main` triggers GitHub Actions validation. Production deployment is intended to follow validation, but the deployment secret is currently a known issue; see `CURRENT_STATUS.md`.
+Pushing `main` triggers GitHub Actions validation and, after validation succeeds, automatic production deployment. Confirm both jobs and the public health endpoint before considering a release complete.
 
 ## Configuration
 

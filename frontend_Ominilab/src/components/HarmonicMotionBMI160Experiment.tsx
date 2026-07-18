@@ -28,6 +28,7 @@ interface AIQuestion {
 interface ExperimentStats {
     period: number; frequency: number; omega: number;
     amplitude: number; vmax: number; amax: number;
+    dataSource: 'physical BMI160 measurement' | 'synthetic judge replay';
 }
 interface SurveyRow {
     id: number; param: number; T: number; Tsq: number;
@@ -152,11 +153,14 @@ function linearRegression(xs: number[], ys: number[]) {
 
 const AI_URL = `${API_CONFIG.python.apiUrl}/api/ai/explain`;
 
-async function callAI(messages: object[], temperature = 0.7, max_tokens = 600): Promise<string> {
+async function callAI(messages: object[], max_tokens = 600): Promise<string> {
     const res = await fetch(AI_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('jwt_token') || ''}` },
-        body: JSON.stringify({ model: 'gpt-4o-mini', messages, temperature, max_tokens, response_format: { type: 'json_object' } })
+        // Model selection is deliberately server-side. The competition backend
+        // fixes this request to OPENAI_MODEL=gpt-5.6 so the browser cannot
+        // override the required model or expose the API key.
+        body: JSON.stringify({ messages, max_tokens })
     });
     if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
@@ -174,7 +178,7 @@ async function generateAIQuestions(stats: ExperimentStats): Promise<AIQuestion[]
         },
         {
             role: 'user',
-            content: `Measured results: T=${stats.period.toFixed(3)}s, f=${stats.frequency.toFixed(3)}Hz, ω=${stats.omega.toFixed(2)}rad/s, A=${stats.amplitude.toFixed(2)}cm, Vmax=${stats.vmax.toFixed(2)}cm/s, amax=${stats.amax.toFixed(3)}m/s²`
+            content: `Data source: ${stats.dataSource}. Results: T=${stats.period.toFixed(3)}s, f=${stats.frequency.toFixed(3)}Hz, ω=${stats.omega.toFixed(2)}rad/s, A=${stats.amplitude.toFixed(2)}cm, Vmax=${stats.vmax.toFixed(2)}cm/s, amax=${stats.amax.toFixed(3)}m/s²`
         }
     ]);
     const raw = JSON.parse(content);
@@ -187,10 +191,10 @@ async function evaluateAnswer(question: string, answer: string, stats: Experimen
     const content = await callAI([
         {
             role: 'system',
-            content: `You are a physics lab tutor. Context: T=${stats.period.toFixed(3)}s, A=${stats.amplitude.toFixed(2)}cm. Evaluate the learner's answer against the experiment. Return JSON only: {"score":0-10,"feedback":"...","correct":"..."}`
+            content: `You are a physics lab tutor. Data source: ${stats.dataSource}. Context: T=${stats.period.toFixed(3)}s, A=${stats.amplitude.toFixed(2)}cm. Evaluate the learner's answer against the supplied run. Return JSON only: {"score":0-10,"feedback":"...","correct":"..."}`
         },
         { role: 'user', content: `Question: ${question}\nLearner answer: ${answer}` }
-    ], 0.4, 300);
+    ], 300);
     return JSON.parse(content);
 }
 
@@ -207,6 +211,7 @@ function HarmonicMotionBMI160Content() {
     const [aiOpen, setAiOpen] = useState(false);
     const [aiQuestions, setAiQuestions] = useState<AIQuestion[]>([]);
     const [aiLoading, setAiLoading] = useState(false);
+    const [aiError, setAiError] = useState<string | null>(null);
     const [surveyOpen, setSurveyOpen] = useState(false);
     const [surveyMode, setSurveyMode] = useState<'mass' | 'spring'>('mass');
     const [surveyRows, setSurveyRows] = useState<SurveyRow[]>([]);
@@ -216,12 +221,15 @@ function HarmonicMotionBMI160Content() {
     const [showX, setShowX] = useState(true);
     const [showV, setShowV] = useState(true);
     const [showA, setShowA] = useState(true);
+    const [isDemoMode, setIsDemoMode] = useState(false);
+    const [hasSyntheticData, setHasSyntheticData] = useState(false);
 
     const ws = useRef<WebSocket | null>(null);
     const isRecRef = useRef(false);
     const bufferRef = useRef<DataPoint[]>([]);
     const processor = useRef(new SignalProcessor());
     const renderTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+    const demoTimer = useRef<ReturnType<typeof setInterval> | null>(null);
     const statusRef = useRef<'idle' | 'calib' | 'live' | 'paused'>('idle');
 
     useEffect(() => { isRecRef.current = isRecording; }, [isRecording]);
@@ -239,7 +247,83 @@ function HarmonicMotionBMI160Content() {
 
     const stopRenderLoop = useCallback(() => { if (renderTimer.current) { clearInterval(renderTimer.current); renderTimer.current = null; } }, []);
 
+    const stopDemo = useCallback((keepData = true) => {
+        if (demoTimer.current) {
+            clearInterval(demoTimer.current);
+            demoTimer.current = null;
+        }
+        setIsDemoMode(false);
+        if (!keepData) setHasSyntheticData(false);
+        setIsRecording(false);
+        setIsConnected(false);
+        statusRef.current = keepData && bufferRef.current.length ? 'live' : 'idle';
+        setStatus(statusRef.current);
+    }, []);
+
+    useEffect(() => () => {
+        if (demoTimer.current) clearInterval(demoTimer.current);
+        if (renderTimer.current) clearInterval(renderTimer.current);
+        ws.current?.close();
+    }, []);
+
+    const startJudgeDemo = useCallback(() => {
+        ws.current?.close();
+        stopRenderLoop();
+        if (demoTimer.current) clearInterval(demoTimer.current);
+
+        const demoPeriod = 0.85;
+        const omega = (2 * Math.PI) / demoPeriod;
+        const amplitudeCm = 4.5;
+        let sampleIndex = 0;
+
+        bufferRef.current = [];
+        processor.current.reset();
+        setDataLog([]);
+        setAiQuestions([]);
+        setPeriod(demoPeriod);
+        setCrossCount(0);
+        setConverging(true);
+        setGravAxisLabel('demo');
+        setIsConnected(false);
+        setIsPaused(false);
+        setIsRecording(true);
+        setIsDemoMode(true);
+        setHasSyntheticData(true);
+        statusRef.current = 'live';
+        setStatus('live');
+
+        demoTimer.current = setInterval(() => {
+            const batch: DataPoint[] = [];
+            for (let i = 0; i < 10; i++) {
+                const t = sampleIndex / 200;
+                const envelope = Math.exp(-0.018 * t);
+                const x = amplitudeCm * envelope * Math.cos(omega * t);
+                const v = -amplitudeCm * omega * envelope * Math.sin(omega * t);
+                const a = -(omega * omega * x) / 100;
+                batch.push({ tSec: t, x, v, a, quality: 1 });
+                sampleIndex++;
+            }
+
+            bufferRef.current.push(...batch);
+            while (bufferRef.current.length > 2000) bufferRef.current.shift();
+            setDataLog([...bufferRef.current]);
+
+            const elapsed = sampleIndex / 200;
+            const cycles = Math.floor(elapsed / demoPeriod);
+            setCrossCount(cycles);
+            setConverging(cycles < 6);
+
+            if (elapsed >= 12) {
+                if (demoTimer.current) clearInterval(demoTimer.current);
+                demoTimer.current = null;
+                setIsRecording(false);
+                setConverging(false);
+            }
+        }, 50);
+    }, [stopRenderLoop]);
+
     const toggleConnection = () => {
+        if (isDemoMode) stopDemo(false);
         if (isConnected) { ws.current?.close(); setIsConnected(false); setStatus('idle'); }
         else {
             const mac = macInput.trim().replace(/:/g, '').toUpperCase();
@@ -275,6 +359,7 @@ function HarmonicMotionBMI160Content() {
         processor.current.reset();
         bufferRef.current = [];
         setDataLog([]);
+        setHasSyntheticData(false);
         setCrossCount(0);
         statusRef.current = 'calib';
         setStatus('calib');
@@ -323,7 +408,15 @@ function HarmonicMotionBMI160Content() {
     const xData = displayData.map(d => d.x); const vData = displayData.map(d => d.v); const aData = displayData.map(d => d.a);
     const A_cm = peakOf(xData); const Vm_cms = peakOf(vData); const Am_ms2 = peakOf(aData);
     const omega = period > 0.1 ? (2 * Math.PI / period) : 0;
-    const stats = { period, frequency: period > 0.1 ? 1/period : 0, omega, amplitude: A_cm, vmax: Vm_cms, amax: Am_ms2 };
+    const stats: ExperimentStats = {
+        period,
+        frequency: period > 0.1 ? 1/period : 0,
+        omega,
+        amplitude: A_cm,
+        vmax: Vm_cms,
+        amax: Am_ms2,
+        dataSource: hasSyntheticData ? 'synthetic judge replay' : 'physical BMI160 measurement',
+    };
 
     const chartData = useMemo(() => ({
         labels: displayData.map(d => d.tSec.toFixed(2)),
@@ -371,8 +464,9 @@ function HarmonicMotionBMI160Content() {
 
     const handleGenerateAI = async () => {
         setAiLoading(true);
+        setAiError(null);
         try { setAiQuestions(await generateAIQuestions(stats)); }
-        catch { alert('AI error — please try again'); }
+        catch (err) { setAiError(err instanceof Error ? err.message : 'AI request failed — please try again.'); }
         finally { setAiLoading(false); }
     };
 
@@ -380,10 +474,12 @@ function HarmonicMotionBMI160Content() {
         const q = aiQuestions[idx];
         if (!q.answer.trim()) return;
         setAiQuestions(prev => prev.map((x, i) => i === idx ? { ...x, evaluating: true } : x));
+        setAiError(null);
         try {
             const ev = await evaluateAnswer(q.text, q.answer, stats);
             setAiQuestions(prev => prev.map((x, i) => i === idx ? { ...x, evaluation: ev, evaluating: false } : x));
-        } catch {
+        } catch (err) {
+            setAiError(err instanceof Error ? err.message : 'AI request failed — please try again.');
             setAiQuestions(prev => prev.map((x, i) => i === idx ? { ...x, evaluating: false } : x));
         }
     };
@@ -403,9 +499,9 @@ function HarmonicMotionBMI160Content() {
                     <h1 className="text-3xl font-bold text-slate-900 uppercase tracking-tight">Harmonic Motion with BMI160</h1>
                     <div className="flex items-center gap-3 mt-1">
                         <span className="px-2 py-0.5 bg-blue-50 border border-blue-100 rounded text-[10px] font-bold uppercase text-blue-600">Experiment 2 (advanced) · Physics 11</span>
-                        <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase ${isConnected ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
-                            {isConnected ? <Wifi size={12}/> : <WifiOff size={12}/>}
-                            {isConnected ? `READY (${gravAxisLabel.toUpperCase()})` : 'NOT CONNECTED'}
+                        <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase ${isDemoMode ? 'bg-violet-50 text-violet-700' : isConnected ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+                            {isDemoMode ? <Waves size={12}/> : isConnected ? <Wifi size={12}/> : <WifiOff size={12}/>}
+                            {isDemoMode ? 'SYNTHETIC REPLAY' : isConnected ? `READY (${gravAxisLabel.toUpperCase()})` : 'NOT CONNECTED'}
                         </div>
                     </div>
                 </div>
@@ -415,7 +511,7 @@ function HarmonicMotionBMI160Content() {
                         onChange={e => setMacInput(e.target.value.toUpperCase())}
                         placeholder="12-character device ID"
                         className="bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm font-mono w-56 px-4 py-2 text-blue-700 font-bold"
-                        disabled={isConnected}
+                        disabled={isConnected || isDemoMode}
                     />
                     <button
                         onClick={toggleConnection}
@@ -431,14 +527,27 @@ function HarmonicMotionBMI160Content() {
                 <aside className="lg:col-span-3 flex flex-col gap-6">
                     <button
                         onClick={handleRecord}
-                        disabled={!isConnected}
+                        disabled={!isConnected || isDemoMode}
                         className={`w-full py-8 rounded-3xl border-2 transition-all flex flex-col items-center justify-center gap-3 shadow-lg ${!isConnected ? 'opacity-30 border-slate-200 bg-white cursor-not-allowed' : isRecording ? 'bg-rose-50 border-rose-500 text-rose-600 shadow-rose-100' : 'bg-blue-600 border-blue-700 text-white shadow-blue-100 hover:bg-blue-700'}`}
                     >
                         {isRecording ? <Square size={32} className="animate-pulse" fill="currentColor"/> : <Play size={32} fill="currentColor"/>}
                         <span className="text-xs font-black uppercase tracking-widest">{isRecording ? 'Stop measuring' : 'Start measuring'}</span>
                     </button>
 
-                    {isConnected && (
+                    <button
+                        onClick={isDemoMode ? () => stopDemo(true) : startJudgeDemo}
+                        className={`w-full py-4 rounded-3xl border-2 text-[10px] font-black uppercase flex items-center justify-center gap-2 transition-all ${isDemoMode ? 'bg-violet-600 text-white border-violet-700' : 'bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100'}`}
+                    >
+                        <Waves size={16}/>{isDemoMode ? 'Stop synthetic replay' : 'Run hardware-free judge demo'}
+                    </button>
+
+                    {isDemoMode && (
+                        <p className="rounded-2xl border border-violet-200 bg-violet-50 px-4 py-3 text-[10px] font-bold leading-relaxed text-violet-800">
+                            SYNTHETIC DATA: a labeled 200 Hz damped-oscillation replay for product evaluation. It is not a BMI160 measurement.
+                        </p>
+                    )}
+
+                    {isConnected && !isDemoMode && (
                         <button
                             onClick={handleRecalib}
                             title="Keep the device still — the ESP32 will recalibrate the gravity axis for one second"
@@ -530,15 +639,20 @@ function HarmonicMotionBMI160Content() {
                         <h3 className="text-base font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
                             <Sparkles size={18} className="text-amber-500"/> AI analysis of measured results
                         </h3>
-                        <button onClick={handleGenerateAI} disabled={aiLoading || period < 0.1}
+                        <button onClick={handleGenerateAI} disabled={aiLoading || dataLog.length < 100 || converging}
                             className="px-5 py-2 bg-amber-500 text-white rounded-xl text-[11px] font-black uppercase disabled:opacity-40 hover:bg-amber-600 transition-all flex items-center gap-2">
                             {aiLoading ? <RefreshCw size={14} className="animate-spin"/> : <Sparkles size={14}/>}
                             {aiLoading ? 'Generating...' : 'Generate questions'}
                         </button>
                     </div>
                     {converging && <p className="text-amber-600 text-xs font-medium mb-4 bg-amber-50 border border-amber-100 rounded-xl px-4 py-2">⚠️ The period has not converged — measure at least six more cycles for accurate questions.</p>}
+                    {aiError && (
+                        <p className="text-rose-700 text-xs font-medium mb-4 bg-rose-50 border border-rose-200 rounded-xl px-4 py-2 flex items-center gap-2">
+                            <AlertCircle size={14} className="flex-shrink-0"/> {aiError}
+                        </p>
+                    )}
                     {aiQuestions.length === 0 && !aiLoading && (
-                        <p className="text-slate-400 text-sm text-center py-8">Select "Generate questions" after measuring to create Bloom-level questions from the experimental results.</p>
+                        <p className="text-slate-400 text-sm text-center py-8">Measure at least six cycles, or run the labeled judge demo, then generate Bloom-level questions grounded in the displayed results.</p>
                     )}
                     <div className="space-y-6">
                         {aiQuestions.map((q, i) => {

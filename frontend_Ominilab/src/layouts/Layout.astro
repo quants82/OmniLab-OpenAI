@@ -13,6 +13,20 @@ const {
   description = 'An open, AI-assisted physics laboratory powered by ESP32 and real experimental data.',
 } = Astro.props;
 const openApiUrl = `${API_CONFIG.python.apiUrl}/docs`;
+const siteUrl = (import.meta.env.PUBLIC_SITE_URL || 'http://localhost:3003').replace(/\/$/, '');
+const canonicalUrl = `${siteUrl}${Astro.url.pathname}`;
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Ominilab',
+  applicationCategory: 'EducationalApplication',
+  operatingSystem: 'Web browser',
+  isAccessibleForFree: true,
+  inLanguage: 'en',
+  url: siteUrl,
+  codeRepository: 'https://github.com/quants82/Ominilab-OpenAI',
+  description,
+};
 ---
 
 <!doctype html>
@@ -22,7 +36,15 @@ const openApiUrl = `${API_CONFIG.python.apiUrl}/docs`;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#1d4ed8" />
+    <link rel="canonical" href={canonicalUrl} />
     <link rel="icon" type="image/png" href="/images/logo.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Ominilab" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta name="twitter:card" content="summary" />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
     <title>{title}</title>
   </head>
   <body class="bg-slate-50 text-slate-900">
@@ -38,8 +60,9 @@ const openApiUrl = `${API_CONFIG.python.apiUrl}/docs`;
           </a>
           <nav class="hidden items-center gap-6 text-sm font-bold text-slate-600 md:flex">
             <a href="/" class="hover:text-blue-700">Home</a>
-            <a href="/experiments" class="hover:text-blue-700">Experiments</a>
-            <a href="/nap-firmware" class="hover:text-blue-700">Flash ESP32</a>
+            <a href="/experiments/" class="hover:text-blue-700">Experiments</a>
+            <a href="/nap-firmware/" class="hover:text-blue-700">Flash ESP32</a>
+            <a href="/judges/" class="hover:text-blue-700">For Judges</a>
             <a href={openApiUrl} class="hover:text-blue-700">Open API</a>
           </nav>
           <Header client:load />

@@ -1,0 +1,103 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { API_CONFIG } from '../config/api.config';
+
+const apiDocsUrl = `${API_CONFIG.python.apiUrl}/docs`;
+const healthUrl = `${API_CONFIG.python.apiUrl}/api/lab/health`;
+
+const criteria = [
+  {
+    title: 'Technological Implementation',
+    text: 'Public MicroPython, browser flashing, FastAPI REST and WebSockets, sensor-specific React analysis, GPT-5.6 Responses API, tests, CI/CD, and project Codex skills.',
+  },
+  {
+    title: 'Design',
+    text: 'A live HTTPS product with a focused six-lab catalog, simple authentication, coherent hardware-to-browser workflow, and an English-first interface.',
+  },
+  {
+    title: 'Potential Impact',
+    text: 'Low-cost open hardware, multiple remote observers, reduced transcription, and one loop connecting science, data, engineering, and critical AI literacy.',
+  },
+  {
+    title: 'Quality of the Idea',
+    text: 'Physical measurements ground AI feedback, bridging authentic hands-on experiments with the reach and responsiveness of a web learning environment.',
+  },
+];
+---
+
+<Layout title="Judge Quick Start - Ominilab" description="Evaluate Ominilab for OpenAI Build Week 2026: live demo, test account, technical evidence, education impact, and disclosed limitations.">
+  <section class="bg-slate-950 text-white">
+    <div class="mx-auto max-w-7xl px-4 py-16 md:py-20">
+      <p class="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">OpenAI Build Week 2026 · Education</p>
+      <h1 class="mt-4 max-w-4xl text-5xl font-black leading-tight">Evaluate the working product, evidence, and Build Week contribution.</h1>
+      <p class="mt-5 max-w-3xl text-lg leading-relaxed text-slate-300">Ominilab combines open ESP32 hardware, live physical measurements, browser analysis, and GPT-5.6 feedback grounded in experiment results.</p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="/experiments/" class="rounded-xl bg-white px-5 py-3 font-black text-slate-950">Explore six labs</a>
+        <a href={apiDocsUrl} class="rounded-xl border border-white/20 px-5 py-3 font-black text-white hover:bg-white/10">Inspect OpenAPI</a>
+        <a href="https://github.com/quants82/Ominilab-OpenAI" class="rounded-xl border border-white/20 px-5 py-3 font-black text-white hover:bg-white/10">Review source</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-7xl px-4 py-16">
+    <div class="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+      <article class="rounded-3xl border border-emerald-200 bg-emerald-50 p-7">
+        <p class="text-xs font-black uppercase tracking-widest text-emerald-700">Free judge access</p>
+        <h2 class="mt-3 text-2xl font-black text-slate-900">Sign in without setup</h2>
+        <dl class="mt-6 grid grid-cols-[auto_1fr] gap-x-4 gap-y-3 text-sm">
+          <dt class="font-bold text-slate-500">Username</dt><dd class="font-mono font-black text-slate-900">judge</dd>
+          <dt class="font-bold text-slate-500">Password</dt><dd class="font-mono font-black text-slate-900">ominilab-demo</dd>
+          <dt class="font-bold text-slate-500">Health</dt><dd><a class="font-bold text-emerald-700 underline" href={healthUrl}>{healthUrl}</a></dd>
+        </dl>
+        <p class="mt-6 text-sm leading-relaxed text-slate-600">No payment, invitation, school account, Teacher/Student role, or PRO membership is required.</p>
+      </article>
+
+      <article class="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
+        <p class="text-xs font-black uppercase tracking-widest text-blue-700">Recommended review</p>
+        <ol class="mt-4 space-y-4 text-sm leading-relaxed text-slate-700">
+          <li><strong>1.</strong> Sign in and browse the six experiment dashboards.</li>
+          <li><strong>2.</strong> Open <a href="/harmonic-motion-bmi160/" class="font-bold text-blue-700 underline">Harmonic Motion</a> and run the explicitly labeled hardware-free judge replay.</li>
+          <li><strong>3.</strong> Open the AI panel after six cycles to generate questions grounded in the displayed replay values.</li>
+          <li><strong>4.</strong> Open <a href="/nap-firmware/" class="font-bold text-blue-700 underline">Flash ESP32</a> to inspect the board and public-source workflow.</li>
+          <li><strong>5.</strong> Use OpenAPI to verify authentication, firmware bundles, health, and the GPT-5.6 adapter.</li>
+          <li><strong>6.</strong> Review the dated Git history and <a href="https://github.com/quants82/Ominilab-OpenAI/blob/main/docs/BUILD_WEEK_DELTA.md" class="font-bold text-blue-700 underline">Build Week delta</a>.</li>
+        </ol>
+      </article>
+    </div>
+  </section>
+
+  <section class="border-y border-slate-200 bg-white">
+    <div class="mx-auto max-w-7xl px-4 py-16">
+      <p class="text-xs font-black uppercase tracking-[0.2em] text-blue-700">Evidence by judging criterion</p>
+      <div class="mt-8 grid gap-5 md:grid-cols-2">
+        {criteria.map((criterion) => (
+          <article class="rounded-3xl border border-slate-200 p-6">
+            <h2 class="text-xl font-black text-slate-900">{criterion.title}</h2>
+            <p class="mt-3 text-sm leading-relaxed text-slate-600">{criterion.text}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-7xl px-4 py-16">
+    <div class="grid gap-8 md:grid-cols-2">
+      <article>
+        <p class="text-xs font-black uppercase tracking-widest text-violet-700">Meaningful GPT-5.6 use</p>
+        <h2 class="mt-3 text-3xl font-black text-slate-900">AI must answer to the experiment.</h2>
+        <p class="mt-4 leading-relaxed text-slate-600">The harmonic-motion lab sends period, frequency, angular frequency, amplitude, maximum velocity, acceleration, and the declared data source to the server. GPT-5.6 generates leveled questions and evaluates the learner's answer against that run. The backend owns the API key and model selection.</p>
+      </article>
+      <article>
+        <p class="text-xs font-black uppercase tracking-widest text-amber-700">Transparent limitations</p>
+        <h2 class="mt-3 text-3xl font-black text-slate-900">What is not claimed.</h2>
+        <ul class="mt-4 space-y-2 text-sm leading-relaxed text-slate-600">
+          <li>New physical measurements still require compatible hardware.</li>
+          <li>GPT-5.6 interaction is currently deepest in the harmonic-motion flagship lab.</li>
+          <li>The UI is English-first, not yet fully localized.</li>
+          <li>Educational outcomes have a pilot plan, not completed controlled-study results.</li>
+          <li>WebSocket channels currently use device IDs without JWT authentication.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+</Layout>
