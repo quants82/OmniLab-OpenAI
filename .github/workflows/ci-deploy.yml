@@ -81,7 +81,7 @@ jobs:
     steps:
       - name: Configure deployment SSH key
         env:
-          SSH_PRIVATE_KEY_BASE64: ${{ secrets.OMNILAB_SSH_PRIVATE_KEY }}
+          SSH_PRIVATE_KEY_BASE64: ${{ secrets.OMINILAB_SSH_PRIVATE_KEY_B64 }}
         run: |
           install -m 0700 -d ~/.ssh
           printf '%s' "$SSH_PRIVATE_KEY_BASE64" | base64 --decode > ~/.ssh/ominilab_deploy
