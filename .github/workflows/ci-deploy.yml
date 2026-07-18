@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       APP_SECRET: ci-only-secret
-      DATABASE_PATH: ${{ runner.temp }}/omnilab-ci.db
+      DATABASE_PATH: /tmp/omnilab-ci.db
       DEMO_USERNAME: judge
       DEMO_PASSWORD: omnilab-demo
 
