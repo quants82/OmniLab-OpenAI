@@ -21,8 +21,8 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
   };
 
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/65 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center overflow-y-auto bg-slate-950/65 p-4 backdrop-blur-sm">
+      <div className="max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto overscroll-contain rounded-3xl bg-white shadow-2xl">
         <div className="bg-gradient-to-r from-blue-700 to-indigo-700 px-7 py-6 text-white">
           <h2 className="text-2xl font-black">{mode === 'login' ? 'Sign in to OmniLab' : 'Create an account'}</h2>
           <p className="mt-1 text-sm text-blue-100">One account gives access to all six open experiments.</p>
