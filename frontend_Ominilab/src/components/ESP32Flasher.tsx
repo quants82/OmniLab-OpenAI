@@ -172,7 +172,9 @@ function Flasher() {
       const base = new Uint8Array(await baseResponse.arrayBuffer());
       await loader.writeFlash({
         fileArray: [{ data: base, address: parseInt(build.address.replace(/^0x/i, ''), 16) || 0 }],
-        flashMode: 'keep', flashFreq: 'keep', flashSize: 'keep', eraseAll: true, compress: true,
+        // compress:true stalled mid-write on the highly compressible
+        // MicroPython image (deflate block timeout); plain writes are reliable.
+        flashMode: 'keep', flashFreq: 'keep', flashSize: 'keep', eraseAll: true, compress: false,
         reportProgress: (_index: number, written: number) => setProgress(Math.round((written / base.length) * 60)),
       } as any);
       try { await loader.after('hard_reset'); } catch { /* manual reset is acceptable */ }
