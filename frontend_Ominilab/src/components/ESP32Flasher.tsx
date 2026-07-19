@@ -163,7 +163,9 @@ function Flasher() {
     try {
       const bundle = await api(`/api/lab/firmware/${firmware.id}/bundle`);
       transport = new Transport(port, false);
-      const loader = new ESPLoader({ transport, baudrate: 460800, terminal } as any);
+      // 460800 drops the serial port mid-write on some boards/cables
+      // (ESP32-C3 USB-JTAG, CH340 clones); 115200 matches the detect step.
+      const loader = new ESPLoader({ transport, baudrate: 115200, terminal } as any);
       await loader.main();
       const baseResponse = await fetch(build.base_file, { cache: 'no-store' });
       if (!baseResponse.ok) throw new Error(`Could not download MicroPython base firmware (${baseResponse.status}).`);
