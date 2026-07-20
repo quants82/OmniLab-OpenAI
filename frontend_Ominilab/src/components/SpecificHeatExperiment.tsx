@@ -40,6 +40,20 @@ function SpecificHeatExperiment() {
 
     const wsRef = useRef<WebSocket | null>(null);
 
+    // Keep the on-screen clock in step with the device LCD: anchor to the
+    // last t received, then tick locally between packets. Freeze when the
+    // timer has not started (t = 0) or packets stop arriving.
+    const timeAnchorRef = useRef<{ t: number; at: number }>({ t: 0, at: 0 });
+    useEffect(() => {
+        const id = window.setInterval(() => {
+            const { t, at } = timeAnchorRef.current;
+            if (t > 0 && at && Date.now() - at < 3000) {
+                setCurrentTime(t + (Date.now() - at) / 1000);
+            }
+        }, 250);
+        return () => window.clearInterval(id);
+    }, []);
+
     // --- WebSocket ---
     const toggleConnection = () => {
         if (isConnected) {
@@ -96,7 +110,7 @@ function SpecificHeatExperiment() {
                 const temp = parseFloat(json.temp);
                 const P = parseFloat(json.P);
 
-                if (!isNaN(t)) setCurrentTime(t);
+                if (!isNaN(t)) { timeAnchorRef.current = { t, at: Date.now() }; setCurrentTime(t); }
                 if (!isNaN(temp)) setCurrentTemp(temp);
                 if (!isNaN(P)) setCurrentPower(P);
 
@@ -254,7 +268,7 @@ function SpecificHeatExperiment() {
                             </div>
                             <div className="text-center py-4 bg-blue-500/10 rounded-xl border border-blue-500/20">
                                 <div className="text-[10px] text-blue-700 font-bold mb-1 uppercase tracking-wider">Time (τ)</div>
-                                <div className="text-5xl font-black text-blue-700 tabular-nums">{currentTime.toFixed(0)}<span className="text-xl ml-1">s</span></div>
+                                <div className="text-5xl font-black text-blue-700 tabular-nums">{Math.floor(currentTime)}<span className="text-xl ml-1">s</span></div>
                             </div>
                             <button onClick={handleRecord} className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-gray-900 font-bold rounded-xl shadow-lg flex items-center justify-center gap-2">
                                 <Plus className="w-5 h-5" /> RECORD MEASUREMENT
