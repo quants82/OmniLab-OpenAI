@@ -41,8 +41,6 @@ WS_PORT = 443
 WS_PATH = "/api/lab/ws/esp32/" + DEVICE_ID
 USE_SSL = True
 
-WIFI_CFG_FILE = "wifi.json"
-
 # --- PIN DEFINITIONS ---
 PIN_DS18B20 = 4
 PIN_BTN = 23
@@ -106,102 +104,6 @@ def init_hardware():
             lcd.putstr(MAC_ADDR[-5:]) # Hiện 5 ký tự cuối của MAC
         except: pass
 
-# --- WIFI MANAGER ---
-class WiFiManager:
-    def __init__(self):
-        self.ssid = ""
-        self.password = ""
-        self.load_config()
-
-    def load_config(self):
-        try:
-            with open(WIFI_CFG_FILE, "r") as f:
-                cfg = ujson.load(f)
-                self.ssid = cfg.get("ssid", "")
-                self.password = cfg.get("pass", "")
-        except: pass
-
-    def save_config(self, ssid, password):
-        try:
-            with open(WIFI_CFG_FILE, "w") as f:
-                ujson.dump({"ssid": ssid, "pass": password}, f)
-        except: pass
-
-    def connect(self, timeout=15):
-        if not self.ssid: return False
-
-        WLAN.active(True)
-        WLAN.connect(self.ssid, self.password)
-        print(f"Connecting to {self.ssid}...")
-
-        start = time.time()
-        while not WLAN.isconnected() and (time.time() - start) < timeout:
-            time.sleep(0.5)
-
-        return WLAN.isconnected()
-
-    def start_portal(self):
-        ap = network.WLAN(network.AP_IF)
-        ap.active(True)
-        ap_name = "Vatli365_Setup_{}".format(MAC_ADDR.replace(':', '')[-4:])
-        ap.config(essid=ap_name, password="ominilab-open")
-
-        print(f"Portal started: {ap_name}")
-        lcd_update("Setup WiFi:", ap_name)
-
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind(('', 80))
-        s.listen(1)
-
-        while True:
-            if btn.value() == 0: # Bấm giữ nút để thoát portal
-                time.sleep(2)
-                if btn.value() == 0: break
-
-            try:
-                s.settimeout(1)
-                conn, addr = s.accept()
-                request = conn.recv(1024).decode()
-
-                if "/save" in request:
-                    import ure
-                    ssid = ure.search("ssid=([^&]*)", request).group(1).replace("+", " ")
-                    password = ure.search("pass=([^&]*)", request).group(1).replace("+", " ")
-                    self.save_config(ssid, password)
-
-                    html = "<html><body><h1>OK! ESP32 is restarting...</h1></body></html>"
-                    conn.send("HTTP/1.1 200 OK\r\n\r\n" + html)
-                    conn.close()
-                    time.sleep(2)
-                    machine.reset()
-
-                # Scan WiFi
-                WLAN.active(True)
-                nets = WLAN.scan()
-                net_options = ""
-                for n in nets:
-                    net_name = n[0].decode()
-                    net_options += f'<option value="{net_name}">{net_name}</option>'
-
-                html = f"""
-                <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-                <style>body{{font-family:sans-serif;padding:20px;background:#f0f4f8}}
-                .card{{background:white;padding:20px;border-radius:10px;box-shadow:0 2px 5px rgba(0,0,0,0.1)}}
-                h2{{color:#2563eb}} input,select{{width:100%;padding:10px;margin:10px 0;border:1px solid #ccc;border-radius:5px}}
-                button{{width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:5px}}</style></head>
-                <body><div class="card"><h2>Vatli365 WiFi Setup</h2><p>MAC: {MAC_ADDR}</p>
-                <form action="/save"><label>Chọn WiFi:</label><select name="ssid_sel" onchange="this.form.ssid.value=this.value">
-                <option value="">-- Chọn --</option>{net_options}</select>
-                <input type="text" name="ssid" placeholder="Tên WiFi">
-                <input type="password" name="pass" placeholder="Mật khẩu">
-                <button type="submit">LƯU VÀ KẾT NỐI</button></form></div></body></html>
-                """
-                conn.send("HTTP/1.1 200 OK\r\n\r\n" + html)
-                conn.close()
-            except: pass
-
-        ap.active(False)
-
 # --- CLOUD WEBSOCKET CLIENT ---
 class CloudClient:
     def __init__(self):
@@ -255,9 +157,11 @@ def main():
     global record_flag, lcd
     init_hardware()
 
-    wifi = WiFiManager()
-    if not wifi.connect():
-        wifi.start_portal()
+    # Same proven flow as the other five labs: try wifi.json, otherwise open
+    # the shared "Ominilab-Setup-XXXX" portal (vatli_auth resets after save).
+    lcd_update("WiFi...", "AP:Setup-" + MAC_ADDR[-4:])
+    if not vatli_auth.connect_wifi():
+        machine.reset()
 
     if WLAN.isconnected():
         lcd_update("WiFi OK", WLAN.ifconfig()[0])
