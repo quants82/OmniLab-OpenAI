@@ -175,6 +175,7 @@ def main():
     # calorimeter (first is_heating). Kits without an INA226 keep the old
     # behaviour of counting from boot.
     t_start = None
+    t_elapsed = 0.0
     last_send = 0
     last_lcd = 0
 
@@ -193,9 +194,12 @@ def main():
                 except: pass
 
             now = time.time()
-            if t_start is None and (is_heating or not ina):
-                t_start = now
-            t_elapsed = (now - t_start) if t_start is not None else 0
+            if is_heating or not ina:
+                if t_start is None:
+                    t_start = now
+                t_elapsed = now - t_start
+            else:
+                t_start = None
 
             # Read Temp
             current_temp = 0
