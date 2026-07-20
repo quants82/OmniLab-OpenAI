@@ -6,7 +6,7 @@
 
 **OpenAI Build Week 2026 · Education track**
 
-Ominilab turns low-cost ESP32 kits into an open, remotely observable physics laboratory. Learners flash readable MicroPython in the browser, collect real sensor measurements, inspect live charts, and use GPT-5.6 to reason from the experiment they actually performed.
+Ominilab turns low-cost ESP32 kits into open physics labs graded by real data: flash open MicroPython from the browser, stream real sensor data live, and let GPT-5.6 generate and grade questions grounded in the experiment you actually performed.
 
 ## Judge in 60 seconds
 

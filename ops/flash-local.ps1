@@ -18,7 +18,7 @@ $sourceDir = Join-Path $repoRoot "frontend_Ominilab\esp32"
 
 $experiments = @{
     "harmonic-motion-bmi160" = @{ source = "esp32_shm_bmi160.py";    extra = @("vatli_auth.py") }
-    "specific-heat"          = @{ source = "esp32_specific_heat.py"; extra = @("vatli_auth.py") }
+    "specific-heat"          = @{ source = "esp32_specific_heat.py"; extra = @("ina226.py", "i2c_lcd.py", "vatli_auth.py") }
     "induction"              = @{ source = "esp32_induction.py";     extra = @("ads1115.py", "vatli_auth.py") }
     "capacitor"              = @{ source = "esp32_capacitor.py";     extra = @("vatli_auth.py") }
     "lamp-va"                = @{ source = "esp32_lamp_va.py";       extra = @("vatli_auth.py") }

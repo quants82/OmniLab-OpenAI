@@ -24,7 +24,7 @@ EXPERIMENTS = {
     "specific-heat": {
         "title": "Specific Heat Capacity of Water",
         "source": "esp32_specific_heat.py",
-        "files": ["vatli_auth.py"],
+        "files": ["ina226.py", "i2c_lcd.py", "vatli_auth.py"],
     },
     "induction": {
         "title": "Electromagnetic Induction",

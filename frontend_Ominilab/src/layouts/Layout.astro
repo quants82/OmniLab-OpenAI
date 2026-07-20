@@ -10,7 +10,7 @@ interface Props {
 
 const {
   title,
-  description = 'An open, AI-assisted physics laboratory powered by ESP32 and real experimental data.',
+  description = 'Flash open MicroPython from the browser, stream real sensor data live, and let GPT-5.6 generate and grade questions grounded in the experiment you actually performed.',
 } = Astro.props;
 const openApiUrl = `${API_CONFIG.python.apiUrl}/docs`;
 const siteUrl = (import.meta.env.PUBLIC_SITE_URL || 'http://localhost:3003').replace(/\/$/, '');

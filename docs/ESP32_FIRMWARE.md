@@ -11,7 +11,7 @@ All application firmware is readable MicroPython under `frontend_Ominilab/esp32`
 | Experiment ID | Main source | Extra files | Device prefix |
 | --- | --- | --- | --- |
 | `harmonic-motion-bmi160` | `esp32_shm_bmi160.py` | `vatli_auth.py` | `ESP32-SHM2-` |
-| `specific-heat` | `esp32_specific_heat.py` | `vatli_auth.py` | `ESP32-SH-` |
+| `specific-heat` | `esp32_specific_heat.py` | `ina226.py`, `i2c_lcd.py`, `vatli_auth.py` | `ESP32-SH-` |
 | `induction` | `esp32_induction.py` | `ads1115.py`, `vatli_auth.py` | `ESP32-Induction-` |
 | `capacitor` | `esp32_capacitor.py` | `vatli_auth.py` | `ESP32-Capacitor-` |
 | `lamp-va` | `esp32_lamp_va.py` | `vatli_auth.py` | `ESP32-Lamp-` |
