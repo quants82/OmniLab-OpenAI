@@ -16,7 +16,7 @@ import {
 import { Line, Scatter } from 'react-chartjs-2';
 import {
     Trash2, Globe, Wifi, WifiOff, Cpu, Power, RefreshCw,
-    Eye, EyeOff, Clock, TrendingUp, Zap, Battery, Sparkles
+    Eye, EyeOff, Clock, TrendingUp, Zap, Battery, Sparkles, Activity
 } from 'lucide-react';
 import { ExperimentTheory } from './shared/ExperimentTheory';
 import { API_CONFIG } from '../config/api.config';
